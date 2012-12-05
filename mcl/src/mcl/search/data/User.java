@@ -52,8 +52,4 @@ public class User extends Common {
 		
 		return PRIMARY_KEY;
 	}
-
-	public static String appendTable(String prop){
-		return User.TABLE_NAME+"."+prop;
-	}
 }

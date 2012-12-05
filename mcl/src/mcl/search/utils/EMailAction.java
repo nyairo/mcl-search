@@ -11,7 +11,7 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import mobitelexx.conf.Config;
+import mcl.search.Config;
 
 public class EMailAction {
 	public static final String SUBJECT_NEW_PASSWORD = "Your new password";

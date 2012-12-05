@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:a4j="http://richfaces.org/a4j">
+<f:view contentType="text/html">
+<h:head>
+<title>Welcome to #{msgs.app_name}</title>
+<h:outputStylesheet library="css" name="application.css"/>
+<h:outputStylesheet name="table-style.css" library="css"></h:outputStylesheet>	
+</h:head>
+<h:body>
+    <div id="page">
+        <div id="header">
+            <div id="headerin">
+                <a href="#" class="logo"><img src="#{facesContext.externalContext.requestContextPath}/images/logo.png" alt="MCL logo"/></a>             
+                <div class="right-controls">                                                        
+                   <ui:insert name="chooser">               
+                   </ui:insert>                 
+                </div>
+            </div>                
+        </div>
+        <div id="page-content">
+        <ui:insert name="page-content">
+            	
+            <div class="left-menu">
+            	<ui:insert name="left-menu">
+            	</ui:insert>			
+            </div>
+            <div class="content-container">
+				<ui:insert name="body">
+				     	Body content missed
+				</ui:insert>
+            </div>
+            <div class="clear"></div>
+            </ui:insert>
+        </div>
+        <div id="footer">
+        <div id="footerin">
+			Copyright.	#{msgs.app_name}. 
+        </div>
+        </div>
+    </div>
+</h:body> 
+</f:view>
+</html>

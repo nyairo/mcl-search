@@ -1,0 +1,48 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:f="http://java.sun.com/jsf/core"
+	  xmlns:rich="http://richfaces.org/rich"
+	  xmlns:a4j="http://richfaces.org/a4j"
+	  xmlns:ui="http://java.sun.com/jsf/facelets">
+
+	   <style>
+            .toolbar {
+                height:14px;
+                width:100px;
+            }
+            .toolbarbutton {
+                border-width:1px;
+                background-color:#{a4jSkin.generalBackgroundColor};
+            }
+        </style>
+
+   <f:view>
+	<h:form>		  		  	
+         <rich:panel header="Images" style="margin:0;">		
+		<h:panelGroup>		
+			<h:panelGrid columns="1" >
+				<h:dataTable value="#{consultBean['imageList']}" var="p"				
+					styleClass="user-table" headerClass="user-table-header"
+					rowClasses="user-table-odd-row,user-table-even-row">
+					
+					
+					<h:column>
+					<f:facet name="header">Photo</f:facet>
+						<a4j:mediaOutput element="img" cacheable="true" session="true" id="img"
+        		    		createContent="#{imageBean.process}" value="#{p['imagedatakey']}"
+            				mimeType="image/jpeg" alt="img" height="300" width="360" />		    				
+    					
+    				</h:column>    				
+    									 				
+					<h:column>
+					<f:facet name="header">Caption</f:facet>    				
+    					#{p['description']}
+    				</h:column>
+    							    			
+				</h:dataTable>
+			</h:panelGrid>
+		</h:panelGroup>
+		</rich:panel>
+	</h:form>
+	</f:view>
+</ui:composition>

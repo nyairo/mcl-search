@@ -22,6 +22,8 @@ public class Login extends AbstractFacesServlet {
 	private static final long serialVersionUID = 1L;
 	public static final String authenticated = "authenticated";
 	public static final String authenticatedUser = "authenticatedUser";
+	public static final String user = "user";
+	public static final String password = "password";
 	private static final Log log = LogFactory.getLog(Login.class);
 
 	/**
@@ -35,8 +37,8 @@ public class Login extends AbstractFacesServlet {
 	protected void processRequest(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 
-		String username = request.getParameter("user");
-		String passwd = request.getParameter("passwd"); 
+		String username = request.getParameter(user);
+		String passwd = request.getParameter(password); 
 		String remote = request.getRemoteAddr();
 		
 		log.info("Login attempt in user:" + username + ":Password:******:from"

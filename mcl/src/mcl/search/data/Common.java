@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
+import mcl.search.Config;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -35,6 +37,10 @@ public abstract class Common extends HashMap<String,Object> implements Serializa
 		{ACTIVE,BOOLEAN},{UID,STRING}};
 	
 	public abstract String getTable();
+	
+	public String getFQTable(){
+		return "`"+Config.getInstance().getDB()+"`.`"+getTable()+"`";
+	}
 	
 	public abstract String getPrimaryKey();
 	
@@ -233,5 +239,42 @@ public abstract class Common extends HashMap<String,Object> implements Serializa
 	 */
 	public void copyFrom(Common copyFrom){
 		putAll(copyFrom);
+	}
+	
+	/**
+	 * get create table String as ONE statement
+	 * 
+	 */
+	public String getCreate(String schema){
+		String type = null;
+		StringBuffer sb = new StringBuffer();		
+		sb.append(" CREATE TABLE  `"+schema+"`.`"+getTable()+"` ( \n ");
+		//sb.append(" CREATE TABLE  "+schema+"."+getTable()+" ( \n ");
+  
+		for(String[] prop: getProperties()){
+			if(LONG==prop[1])
+				type = " int(11) ";
+			else if (STRING==prop[1])
+				type = " varchar(225) ";
+			else if (DATE==prop[1])
+				type = " datetime ";
+			else if (BOOLEAN==prop[1])
+				type = " int(1) ";
+			
+			if(prop[0]==getPrimaryKey()){
+				sb.append("`"+prop[0]+"` "+ type +" NOT NULL AUTO_INCREMENT , \n");
+				//sb.append(prop[0]+"  "+ type +" NOT NULL AUTO_INCREMENT, \n");
+			}else{
+				sb.append(" "+prop[0]+" "+type +" , \n");
+			}					
+		}
+		sb.append("PRIMARY KEY  ("+getPrimaryKey()+") \n");//primary key
+		//sb.append("PRIMARY KEY  (`"+getPrimaryKey()+"`) \n");//primary key
+		sb.append(") ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8; \n");
+		return sb.toString();
+	}
+	
+	public  String appendTable(String prop){
+		return getTable()+"."+prop;
 	}
 }

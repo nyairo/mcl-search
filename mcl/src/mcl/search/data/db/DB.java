@@ -8,10 +8,20 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import mcl.search.Config;
+import mcl.search.data.CCollection;
+import mcl.search.data.Catalog;
+import mcl.search.data.CatalogUrl;
+import mcl.search.data.Common;
+import mcl.search.data.Concept;
+import mcl.search.data.User;
+import mcl.search.data.model.CatalogModel;
+import mcl.search.data.model.UserModel;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,8 +32,14 @@ public class DB {
 
 	private static final Log log = LogFactory.getLog(DB.class);
 
-	private static DB instance = null;
-	private ConnectionPool pool = null;	
+	private static DB db_instance = null;
+	private static DB sdb_instance = null; //Superuser db_instance when we need it
+	private ConnectionPool pool = null;
+
+	private boolean superuser = false;
+	private static Common[] tables = new Common[]{new CCollection(),new Concept(),
+		new User(), new Catalog(), new CatalogUrl()	
+	};
 
 	private DB(Config config) {		
 		configure(config);
@@ -62,24 +78,41 @@ public class DB {
 			log.debug("Connection Failed! Check output console");
 			log.error(e.getMessage(), e);
 		}
-
 	}
 
-	public static Session getSession(Config config) throws SQLException {
+	public static Session getSession(boolean isBatch) throws SQLException {
 
-		if (instance == null)
-			instance = new DB(Config.getInstance());
+		if (db_instance == null)
+			db_instance = new DB(Config.getInstance());
 
-		if(instance.pool==null)
-			instance.configure(Config.getInstance());
-		if(instance.pool==null)//If we can't still initialize
+		if(db_instance.pool==null)
+			db_instance.configure(Config.getInstance());
+		if(db_instance.pool==null)//If we can't still initialize
 			return null;
-		return new Session(instance.pool.checkout());
+		return new Session(db_instance.pool.checkout(), isBatch);
+	}
+	
+	public static Session getSSession(String suser, String spassword, boolean isBatch) throws SQLException {
+		Config.getSInstance(suser,spassword);
+		if (sdb_instance == null||!sdb_instance.superuser)
+			sdb_instance = new DB(Config.getSInstance());
+
+			sdb_instance.pool.checkout();
+			if(sdb_instance.pool==null)
+				sdb_instance.configure(Config.getSInstance());
+			if(sdb_instance.pool==null)//If we can't still initialize
+				return null;	
+		return new Session(sdb_instance.pool.checkout(), isBatch);
 	}
 
 	public static DB getIntance() {
-		return instance;
+		return db_instance;
 	}
+	
+	public static DB getSIntance() {
+		return sdb_instance;
+	}
+	
 
 	public static void close(Statement st) {
 		try {
@@ -98,8 +131,11 @@ public class DB {
 			log.error(e.getMessage(), e);
 		}
 	}
-
 	public static BigDecimal getNextID(String entityName) throws SQLException {
+		return DB.getNextID(entityName, false);
+	}	
+	
+	public static BigDecimal getNextID(String entityName, boolean s) throws SQLException {
 		BigDecimal seqid = null;
 
 		seqid = cache.get(entityName);
@@ -107,7 +143,7 @@ public class DB {
 		if (seqid == null) {
 			// PreparedStatement seqQ = null;
 			ResultSet rs = null;
-			Session session = getSession(null);
+			Session session = getSession(false);
 			try {
 				session.createStatement("select seq.ad_sequence_id from ad_sequence seq where seq.name=?");
 				session.getStmt().setString(1, entityName);
@@ -130,7 +166,10 @@ public class DB {
 		CallableStatement pst = null;
 		Connection c = null;
 		try {
-			c = instance.pool.checkout();
+			if(s)
+				c = sdb_instance.pool.checkout();			
+			else
+				c = db_instance.pool.checkout();
 			pst = c.prepareCall("{call nextid(?,?,?)}");
 			pst.registerOutParameter(3, Types.INTEGER);
 			log.debug("ID for " + entityName + ":" + seqid + ": intValue :"
@@ -143,13 +182,27 @@ public class DB {
 			log.error(e.getMessage(), e);
 		} finally {
 			DB.close(pst);
-			instance.pool.checkin(c);
+			if(s)
+				sdb_instance.pool.checkin(c);
+			else
+				db_instance.pool.checkin(c);
+			
 		}
 		return new BigDecimal(id);
 	}
 
+	
+	public void checkIn(Connection c, boolean s) {
+		if(s)
+			sdb_instance.pool.checkin(c);
+		else
+			db_instance.pool.checkin(c);
+	}
+	
+	
+	
 	public void checkIn(Connection c) {
-		instance.pool.checkin(c);
+		checkIn(c, false);
 	}
 
 	public static void close(PreparedStatement pst, ResultSet rs) {
@@ -157,10 +210,16 @@ public class DB {
 		close(pst);
 	}
 
-	public void destroy(Connection c) {
-		instance.pool.destroy(c);
+	public void destroy(Connection c, boolean s) {
+		sdb_instance.pool.destroy(c);
 	}
 
+	public void destroy(Connection c) {
+		db_instance.pool.destroy(c);
+	}
+
+	
+	
 	public static boolean isValid(Connection c) {
 		Statement stmt = null;
 		ResultSet rs = null;
@@ -186,5 +245,103 @@ public class DB {
 			}
 		}
 		return valid;
+	}
+	
+	/**
+	 * 
+	 * @param schema
+	 * @param user
+	 * @param userpassword
+	 * @param suser
+	 * @param spassword
+	 * @return
+	 */
+	public static String createDB(String schema, String user,String userpassword,  String suser, String spassword){
+		
+		try {
+			
+			
+			Session session = DB.getSSession(suser,spassword, true);	
+			
+			try{
+				session.createStatement("DROP USER '"+user+"'@'localhost';");
+				session.execute();
+				session.close();
+			}catch(Exception ex){
+				session.closeS();
+			}
+			
+			session = DB.getSSession(suser, spassword, true);
+			
+			session.createStatement();
+			
+			Config.getInstance().setProperty(Config.DB, schema);
+			Config.getInstance().setProperty(Config.DBUSER, user);
+			Config.getInstance().setProperty(Config.DBPW, userpassword);
+			Config.getInstance().write();
+			
+			
+			session.addBatch("CREATE DATABASE `"+schema+"` /*!40100 DEFAULT CHARACTER SET latin1 */; \n");
+			session.addBatch("FLUSH PRIVILEGES; \n");
+			
+			session.addBatch("CREATE USER '"+user+"'@'localhost' IDENTIFIED BY '"+userpassword+"'; \n");
+			session.addBatch("GRANT USAGE ON `"+schema+"`.* TO '"+user+"'@'localhost';");
+			//session.addBatch("UPDATE USER SET password=PASSWORD('"+userpassword+"') where USER='"+user+"'@'localhost';");
+			session.addBatch("GRANT ALL PRIVILEGES ON `"+schema+"`.* TO '"+user+"'@'localhost' WITH GRANT OPTION; \n");
+
+			for(Common c: tables){
+				session.addBatch(" DROP TABLE IF EXISTS "+c.getFQTable()+"; \n");
+				session.addBatch(c.getCreate(schema)+"\n");
+			}											
+			session.executeBatchQuery();
+			session.closeS();
+			
+			UserModel userm = new UserModel();
+			User newUser = (User) userm.getNew().initialiaze();
+			newUser.put(User.USERNAME, user);
+			newUser.put(User.PASSWORD, userpassword);
+			userm.insertUser(newUser);
+			
+			/*session  = DB.getSession(true);
+			String catTable = "`"+schema+"`.`"+Catalog.TABLE_NAME+"`";
+			session.createStatement();
+			session.addBatch("INSERT INTO "+catTable+" ( "+Catalog.NAME+" ) VALUES('TEST');");
+			session.executeBatchQuery();
+			session.close();*/
+			
+			List urls  = new ArrayList();
+			CatalogModel catm = new CatalogModel();
+			Catalog cat = (Catalog) catm.getNew().initialiaze();
+			cat.put(Catalog.NAME,"test");
+			CatalogUrl url = null;
+			
+			url = (CatalogUrl) catm.getNewUrl().initialiaze();
+			url.put(CatalogUrl.URL, "/Test");
+			url.put(CatalogUrl.DESCRIPTION, "Test desc");
+			urls.add(url);
+			cat.put(Catalog.URLS,urls);
+			
+			catm.insertCatalog(cat);
+			
+			cat = (Catalog) catm.getNew().initialiaze();
+			cat.put(Catalog.NAME,"test2");			
+			
+			url = (CatalogUrl) catm.getNewUrl().initialiaze();
+			url.put(CatalogUrl.URL, "/Test2");
+			url.put(CatalogUrl.DESCRIPTION, "Test desc2");
+			urls.add(url);
+			cat.put(Catalog.URLS,urls);
+			
+			catm.insertCatalog(cat);
+			
+			
+			
+		} catch (SQLException e) {
+			
+			e.printStackTrace();
+			return e.getMessage();
+		}
+		
+		return "done";
 	}
 }

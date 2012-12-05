@@ -47,7 +47,7 @@ public class CCollectionServlet extends AbstractFacesServlet {
 			        processFormField(item, collection);
 			    }
 			}    	
-			collection.put(CCollection.STATUS, CCollection.STATUS_INBOX);
+			//collection.put(CCollection.STATUS, CCollection.STATUS_INBOX);
 			collection.put(CCollection.UPDATEDBY, 0);
 			writeResponse(model.insertConsult(collection), response);
 		}catch(Exception ex){

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faces-config version="2.0" xmlns="http://java.sun.com/xml/ns/javaee"
+ xmlns:xi="http://www.w3.org/2001/XInclude"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd">
+ 
+ 
+ <navigation-rule>
+  <from-view-id>*</from-view-id>
+  <navigation-case>
+   <from-outcome>*</from-outcome>
+   <to-view-id>/pages/catalog.xhtml</to-view-id>
+  </navigation-case>
+ </navigation-rule>
+ <!-- 
+ <navigation-rule>
+  <from-view-id>/pages/login.xhtml</from-view-id>
+  <navigation-case>
+   <from-action>#{loggedInUserBean.valid}</from-action>
+   <from-outcome>true</from-outcome>
+   <to-view-id>/pages/consults.xhtml</to-view-id>
+  </navigation-case>
+   
+  <navigation-case>
+   <from-outcome>newPassword</from-outcome>
+   <to-view-id>/pages/newPassword.xhtml</to-view-id>
+  </navigation-case>
+  <navigation-case>
+   <to-view-id>/pages/login.xhtml</to-view-id>
+  </navigation-case>
+ </navigation-rule>
+ <navigation-rule>
+  <from-view-id>*</from-view-id>
+  <navigation-case>
+   <from-outcome>logout</from-outcome>
+   <to-view-id>/pages/login.xhtml</to-view-id>
+  </navigation-case>
+ </navigation-rule>
+ <navigation-rule>
+  <from-view-id>*</from-view-id>
+  <navigation-case>
+   <from-outcome>menu</from-outcome>
+   <to-view-id>/pages/consults.xhtml</to-view-id>
+  </navigation-case>
+ </navigation-rule>
+ -->
+<application>
+  <resource-bundle>
+   <base-name>resources</base-name>
+   <var>msgs</var>
+  </resource-bundle>
+ </application>
+ 
+ 
+ <lifecycle>
+  <phase-listener id="nocache">mcl.search.utils.CacheControlPhaseListener</phase-listener>
+ </lifecycle>
+ 
+</faces-config>

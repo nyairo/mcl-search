@@ -1,0 +1,44 @@
+@CHARSET "ISO-8859-1";
+
+.user-table{   
+	border-collapse:collapse;
+	font-size:13px;
+	height: 100%;	
+}
+ 
+.user-table-header{
+	text-align:left;
+	/*
+	border-bottom:1px solid #BBBBBB;
+	padding:5px;*/
+}
+ 
+.user-table-odd-row{
+	 
+
+    background-color: #ECF3FE;
+
+	
+	text-align:left;
+	
+	/*
+	background:none repeat scroll 0 0 #F9F9F9;
+	
+	border-top:1px solid #BBBBBB;*/
+}
+ 
+.user-table-even-row{
+	
+    background-color: #FCFFFE;
+	
+	text-align:left;
+	
+	/*
+	background:none repeat scroll 0 0 #E8E8E8;	
+	border-top:1px solid #BBBBBB;*/
+}
+
+.user-table-active-row {
+    background-color: #FFEBDA !important;
+    cursor: pointer;
+}

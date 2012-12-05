@@ -21,12 +21,15 @@ public class Session {
 	
 	private Connection connection = null;
 	private ResultSet rs = null;
+	private int[] updatecount = null;
 	private PreparedStatement stmt = null;
 	private boolean isOpen = false;
 	
-	public Session(Connection c){
+	public Session(Connection c, boolean isBatch) throws SQLException{
 		connection = c;
-		isOpen = true;
+		isOpen = true;		
+		if(isBatch)
+			connection.setAutoCommit(false);
 	}
 	
 
@@ -48,6 +51,10 @@ public class Session {
 		return rs;
 	}
 	
+	public int[] getCount(){
+		return updatecount;
+	}
+	
 	public PreparedStatement getStmt() {
 		return stmt;
 	}
@@ -63,14 +70,17 @@ public class Session {
 		rs = stmt.getGeneratedKeys();
 		return 	count;	
 	}
-	
-	
+	public PreparedStatement createStatement()
+	throws SQLException {
+		return createStatement("");
+	}
 	public PreparedStatement createStatement(String sql)
 	throws SQLException {
 		stmt = connection.prepareStatement(sql); 
 		
 	return stmt;
-	}	
+	}
+	
 	public boolean isOpen(){
 		return isOpen;
 	}	
@@ -83,7 +93,26 @@ public class Session {
 			DB.getIntance().destroy(connection);		
 		isOpen = false;
 	}
+	
+	public void closeS(){
+		DB.close(stmt, rs);
+		
+		if (DB.isValid(connection))
+			DB.getSIntance().checkIn(connection, true);
+		else
+			DB.getSIntance().destroy(connection, true);		
+		isOpen = false;
+	}
 	public void executeQuery() throws SQLException {
 		rs = stmt.executeQuery();		
+	}
+	
+	public void executeBatchQuery() throws SQLException {			    
+		updatecount = stmt.executeBatch();
+		connection.commit();
+	}
+	
+	public void addBatch(String sql) throws SQLException{
+		stmt.addBatch(sql);
 	}
 }

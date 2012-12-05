@@ -17,14 +17,14 @@ public class CCollection extends Common implements Serializable {
 	
 	
 	
-	public static final String properties[][] = {{PRIMARY_KEY,LONG},{STRING,NAME},
+	public static final String properties[][] = {{PRIMARY_KEY,LONG},{NAME,STRING},
 		{USERID,STRING},{PUBLIC,STRING},{UPDATEDBY,DATE}};	
 
 	public static final String TABLE_NAME = "Collection";
 	
 	
 	private Mapping[] mappings = new Mapping[]{
-			new Mapping(new String[]{"ufirst","ulast"},User.TABLE_NAME+"."+User.FIRSTNAME+" as ufirst, "+User.TABLE_NAME+"."+User.LASTNAME+" as ulast ",Consult.PROVIDER,User.TABLE_NAME,User.USERNAME)
+			//new Mapping(new String[]{"ufirst","ulast"},User.TABLE_NAME+"."+User.FIRSTNAME+" as ufirst, "+User.TABLE_NAME+"."+User.LASTNAME+" as ulast ",Consult.PROVIDER,User.TABLE_NAME,User.USERNAME)
 			};
 	
 	@Override
@@ -59,8 +59,5 @@ public class CCollection extends Common implements Serializable {
 		return PRIMARY_KEY;
 	}
 	
-	public static final String appendTable(String name){
-		return TABLE_NAME+"."+name;
-	}
 }
 

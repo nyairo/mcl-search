@@ -1,0 +1,39 @@
+<ui:composition 
+	  xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:f="http://java.sun.com/jsf/core"
+	  xmlns:a4j="http://richfaces.org/a4j"
+	  xmlns:rich="http://richfaces.org/rich"
+	  xmlns:ui="http://java.sun.com/jsf/facelets">
+		<div id="mainlogin">      
+		<h:form>
+			<h:panelGrid columns="3">
+				<h:outputText  value="#{msgs.username}" />
+				<h:inputText id="username" value="#{loggedInUserBean.username}">					
+					<rich:validator/>							
+				</h:inputText>
+				<rich:message for="username"></rich:message>
+				<h:outputText value="#{msgs.password}" />
+				<h:inputSecret id="password" value="#{loggedInUserBean.password}">
+				<rich:validator/>														
+				</h:inputSecret>								
+				<rich:message for="password"></rich:message>
+				<h:outputText value="" />
+				<h:panelGrid columns="2">		
+					<h:commandButton action="#{loggedInUserBean.valid}" class="button" value="Login" 
+						reRender="login"/>
+				</h:panelGrid>
+			</h:panelGrid>
+			</h:form>
+			<h:form>
+			 	<h:commandLink action="newPassword" value="Forgot Password?" />
+			 </h:form>							
+			<a4j:outputPanel id="login">
+				<h:outputText value="Login failed, #{loggedInUserBean.username}  "
+					rendered="#{not empty loggedInUserBean.error}" />
+				<h:outputText value="#{loggedInUserBean.error}" />
+				<h:outputText value="!" rendered="#{not empty loggedInUserBean.error}" />
+			</a4j:outputPanel>					
+		</div>					
+		
+</ui:composition>

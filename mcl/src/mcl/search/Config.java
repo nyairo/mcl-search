@@ -1,6 +1,8 @@
 package mcl.search;
 
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.net.URL;
 import java.util.Properties;
 
@@ -15,16 +17,15 @@ public class Config {
 
 	private static final Log log = LogFactory.getLog(Config.class);
 
-	private static Config instance = null;
+	private static Config sconf_instance = null;
+	private static Config conf_instance = null;
 	private static final String DBTYPE 				= "dbtype";
 	private static final String DBHOST 				= "dbhost";
 	private static final String DBPORT 				= "dbport";
-	private static final String DB 					= "db";
+	public static final String DB 					= "db";
 	private static final String DBCLASSNAME 		= "dbclassname";
-	private static final String DBUSER 				= "dbuser";
-	private static final String DBPW 				= "dbpw";
-	private static final String IMAGES_FOLDER 		= "images_folder";
-	private static final String TEMP_FOLDER 		= "temp_folder";
+	public static final String DBUSER 				= "dbuser";
+	public static final String DBPW 				= "dbpw";		
 	private static final String MAIL_PROTOCOL 		= "mail_protocol";
 	private static final String MAIL_HOST			= "mail_host";
 	private static final String MAIL_USER 			= "mail_user";
@@ -34,7 +35,8 @@ public class Config {
 
 	private static final String MAIL_USE_AUTH 		= "mail_use_auth";
 
-	
+	private static final String dbuser = "dbuser";
+	private static final String dbpw = "dbpw";
 
 	private Properties properties = null;
 
@@ -61,6 +63,11 @@ public class Config {
 			e1.printStackTrace();
 		}
 		log.debug("read configuration");
+		load_conf(context);
+
+	}
+
+	private void load_conf(ExternalContext context) {
 		try {
 			String config_filename = "/WEB-INF/conf.properties";
 			properties = new Properties();
@@ -69,16 +76,34 @@ public class Config {
 		} catch (Exception e) {
 			log.equals(e);
 		}
-
+		
 	}
 
 	public static Config getInstance() {
-		if (instance == null) {
-			instance = new Config();
+		if (conf_instance == null) {
+			conf_instance = new Config();
 		}
-		return instance;
+		return conf_instance;
 	}
-
+	
+	
+	public static Config getSInstance() {
+		
+		return sconf_instance;
+	}
+		
+	public static Config getSInstance(String suser, String spassword) {
+		if (sconf_instance == null ) {
+			sconf_instance = new Config();			
+			sconf_instance.setProperty(dbuser, suser);
+			sconf_instance.setProperty(dbpw, spassword);
+			sconf_instance.setProperty(DB, "information_schema"); //Assume user is root or has super user privs
+		}
+		return sconf_instance;
+	}
+	
+	
+	
 	private String getProperty(String name) {
 		return (String) properties.get(name);
 
@@ -118,14 +143,6 @@ public class Config {
 	public String getDBCLASSNAME() {
 		return getProperty(DBCLASSNAME);
 	}
-	
-	public String getIMAGES_FOLDER(){
-		return getProperty(IMAGES_FOLDER);
-	}
-	
-	public String getTEMP_FOLDER(){
-		return getProperty(TEMP_FOLDER);
-	}
 
 	public String getMAIL_HOST() {
 		
@@ -156,6 +173,31 @@ public class Config {
 	public Object getMAIL_USE_AUTH() {
 		
 		return getProperty(MAIL_USE_AUTH);
+	}
+
+	public void setDB(String schema) {
+		properties.put(DB, schema);		
+		write();
+	}
+	public void setProperty(String prop, String value){
+		if(value!=null)
+			properties.put(prop, value);
+	}
+	public void write(){
+		log.debug("write configuration");
+		ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+		try {
+			String config_filename = "/WEB-INF/conf.properties";		
+			String url = context.getRealPath(config_filename);
+			FileOutputStream out = new FileOutputStream(new File(url));			
+			properties.store(out, null);
+			out.close();
+			out = null;
+			load_conf(context);
+			log.debug("write configuration ok");
+		} catch (Exception e) {
+			log.equals(e);
+		}
 	}
 
 }
