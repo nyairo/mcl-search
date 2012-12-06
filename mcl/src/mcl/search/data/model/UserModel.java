@@ -22,7 +22,7 @@ public class UserModel extends BaseModel implements Serializable {
 
 	}
 
-	public Long insertUser(User user) throws SQLException {
+	public Integer insertUser(User user) throws SQLException {
 
 		return insertObject(user);
 	}
@@ -36,6 +36,17 @@ public class UserModel extends BaseModel implements Serializable {
 		return null;
 	}
 
+
+	public User user(String username) throws SQLException{
+		User user = getUser(username);
+		if(user==null){
+			user = getNew();
+			user.put(User.USERNAME, username);
+			insertUser(user);
+		}
+		return user;
+	}
+	
 	public User getUser(String where, String[] values) {
 		try {
 			return (User) getObject(getNew(), where, values);
@@ -44,6 +55,7 @@ public class UserModel extends BaseModel implements Serializable {
 		}
 		return null;
 	}
+	
 
 	public User getNew() {
 		User user = new User();

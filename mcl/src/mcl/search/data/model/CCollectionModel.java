@@ -6,6 +6,7 @@ import java.util.List;
 
 import mcl.search.data.CCollection;
 import mcl.search.data.Common;
+import mcl.search.data.User;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,50 +32,78 @@ public class CCollectionModel extends BaseModel  implements Serializable{
 		return cons.initialiaze();
 	}
 	
-	public Long insertConsult(CCollection consult){
-		Long id = null;
+
+	public CCollection getCCollection(Integer id, String name) {
 		try {
-			id = insertObject(consult);
+			
+			CCollection col = (CCollection) getObject(getNew(), CCollection.USERID+"=? AND "+CCollection.NAME+"=?", new String[]{id.toString(),name});
+			if(col!=null)
+				col.put(CCollection.CONCEPTS,new ConceptModel().getConcepts((Integer) col.get(CCollection.PRIMARY_KEY)));
+			return col; 
+			
 		} catch (SQLException e) {
-			log.error("Error ocurred when inserting consult.",e);
+			log.error("Error retrieving collection with name/userid:" + name+"/"+id, e);
+		}
+		return null;
+	}
+	
+	public CCollection collection(Integer id, String name) throws SQLException{
+		CCollection col = getCCollection(id,name);
+		if(col==null){
+			col = (CCollection) getNew();
+			col.put(CCollection.NAME, name);
+			col.put(CCollection.USERID, id);
+			insertCCollection(col);
+		}//else{
+		//	col.put(CCollection.CONCEPTS,new ConceptModel().getConcepts((Integer) col.get(CCollection.PRIMARY_KEY)));
+		//}
+		return col;
+	}
+	
+	public Integer insertCCollection(CCollection collection){
+		Integer id = null;
+		try {
+			id = insertObject(collection);
+		} catch (SQLException e) {
+			log.error("Error ocurred when inserting collection.",e);
 		} 
 		return id;
 	}	
 
-	public CCollection getConsult(String consult_id){		
+	public CCollection getCCollection(String collection_id){		
 		try {
-			return (CCollection) getObject(getNew(),CCollection.PRIMARY_KEY+"=?", new String[]{consult_id});
+			return (CCollection) getObject(getNew(),CCollection.PRIMARY_KEY+"=?", new String[]{collection_id});
 		} catch (SQLException e) {
-			log.error("Error retrieving consult with consult_id:"+consult_id,e);
+			log.error("Error retrieving collection with collection_id:"+collection_id,e);
 		}
 		return null;
 	}	
 	
-	public List<CCollection> getConsults() throws SQLException {
+	public List<CCollection> getCCollections() throws SQLException {
 		return (List<CCollection>) getObjects(new CCollection());
 	}
 	
-	public void updateConsult(){
+	public void updateCCollection(){
 		
 	}
 	
-	public boolean deleteConsult(CCollection consult) throws SQLException{
-		return deleteObject(consult,CCollection.PRIMARY_KEY);
+	public boolean deleteCCollection(CCollection collection) throws SQLException{
+		return deleteObject(collection,CCollection.PRIMARY_KEY);
 	}
 
-	public List<CCollection> getConsults(String where, String[] values) throws SQLException {
+	public List<CCollection> getCCollections(String where, String[] values) throws SQLException {
 		 
 		return (List<CCollection>) getObjects(new CCollection(), where, values);
 	}
-	
+
 	/*@SuppressWarnings("unchecked")
 	public List<Message> getMessages(String device_id, String receipt) throws SQLException{
 		
 		return (List<Message>) getObjects(new Message(), 
-				Consult.TABLE_NAME+"."+Consult.DEVICE_ID+"=? AND "
-				+Consult.TABLE_NAME+"."+Consult.STATUS+"=? AND "
-				+Consult.TABLE_NAME+"."+Consult.UID+" NOT IN ("+receipt+") ",
-				new String[]{device_id,Consult.STATUS_OUTBOX});
+				CCollection.TABLE_NAME+"."+CCollection.DEVICE_ID+"=? AND "
+				+CCollection.TABLE_NAME+"."+CCollection.STATUS+"=? AND "
+				+CCollection.TABLE_NAME+"."+CCollection.UID+" NOT IN ("+receipt+") ",
+				new String[]{device_id,CCollection.STATUS_OUTBOX});
 				
 	}*/
 }

@@ -20,7 +20,7 @@ public class User extends Common {
 	
 	public static final String PRIMARY_KEY = USER_ID;
 	
-	private static final String properties[][] = {{USER_ID,LONG},{USERNAME,STRING},
+	private static final String properties[][] = {{USER_ID,INTEGER},{USERNAME,STRING},
 		{FIRSTNAME,STRING}, {MIDDLENAME,STRING}, 
 		{LASTNAME,STRING}, {EMAIL,STRING}, {ADMIN,BOOLEAN}, 
 		 {PASSWORD,STRING},{PHONE,STRING}};
@@ -51,5 +51,11 @@ public class User extends Common {
 	public String getPrimaryKey() {
 		
 		return PRIMARY_KEY;
+	}
+
+	@Override
+	public String[] getStatements() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

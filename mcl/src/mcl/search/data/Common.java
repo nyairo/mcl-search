@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import mcl.search.Config;
@@ -20,7 +21,7 @@ public abstract class Common extends HashMap<String,Object> implements Serializa
 	//public static final String DATE_LONG 	= "DATE_LONG";
 	public static final String BOOLEAN 	= "BOOLEAN";
 	public static final String STRING 	= "STRING";
-	public static final String LONG 	= "LONG";
+	public static final String INTEGER 	= "INTEGER";
 	//private static final DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.FULL,Locale.UK);
 	
 	public static final String CREATED 	= "created";
@@ -52,6 +53,12 @@ public abstract class Common extends HashMap<String,Object> implements Serializa
 		return null;
 	}
 	
+	
+	public String[] getChildren(){
+		return null;
+	}
+	
+	
 	//public static <T> String[] concat(String[] first, String[] second) {
 	public static String[][] concat(String[][] first, String[][] second) {
 		  String[][] result = Arrays.copyOf(first, first.length + second.length);
@@ -79,7 +86,7 @@ public abstract class Common extends HashMap<String,Object> implements Serializa
 		if(STRING.equals(property[1])){
 			strVal = rs.getString(property[0]);			
 		}
-		else if(LONG.equals(property[1])){
+		else if(INTEGER.equals(property[1])){
 			Long val = rs.getLong(property[0]);
 			if(val==null)
 				strVal = "";
@@ -107,14 +114,26 @@ public abstract class Common extends HashMap<String,Object> implements Serializa
 	
 	public String stringify(){
 		StringBuffer json = new StringBuffer("{");
-		
-		
-		
+						
 		Mapping[] mappings = getMappings();
 		if(mappings!=null)
 		for(Mapping map: mappings){
 			for(String prop: map.getProperties()){				
 				json.append(prop+":'"+get(prop)+"',");
+			}
+		}
+		
+		String[] children = getChildren();
+		if(children!=null){
+			List<Common> kids = null;
+			for(String prop: children){	
+				kids = (List<Common>) get(prop);
+				json.append(prop+":[");
+				for(Common kid: kids){
+					json.append((kid.stringify()+"',"));
+				}
+				json.deleteCharAt(json.length()-1);//remove last comma
+				json.append("],");
 			}
 		}
 		
@@ -127,8 +146,7 @@ public abstract class Common extends HashMap<String,Object> implements Serializa
 				json.append(prop[0]+":'"+get(prop[0])+"'}");
 			else
 				json.append(prop[0]+":'"+get(prop[0])+"',");
-		}
-		
+		}					
 		return json.toString();
 	}
 	/**
@@ -172,7 +190,7 @@ public abstract class Common extends HashMap<String,Object> implements Serializa
 		if(STRING.equals(property[1])){
 			return get(property[0]);
 		}
-		else if(LONG.equals(property[1])){
+		else if(INTEGER.equals(property[1])){
 			Long val = null;
 			try{				
 				val = new Long(get(property[0]));
@@ -252,7 +270,7 @@ public abstract class Common extends HashMap<String,Object> implements Serializa
 		//sb.append(" CREATE TABLE  "+schema+"."+getTable()+" ( \n ");
   
 		for(String[] prop: getProperties()){
-			if(LONG==prop[1])
+			if(INTEGER==prop[1])
 				type = " int(11) ";
 			else if (STRING==prop[1])
 				type = " varchar(225) ";
@@ -277,4 +295,10 @@ public abstract class Common extends HashMap<String,Object> implements Serializa
 	public  String appendTable(String prop){
 		return getTable()+"."+prop;
 	}
+	
+	public Integer getID(){
+		return (Integer) get(getPrimaryKey());
+	}
+	
+	public abstract String[] getStatements();
 }

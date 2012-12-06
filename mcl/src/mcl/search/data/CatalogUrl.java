@@ -13,7 +13,7 @@ public class CatalogUrl extends Common {
 	public static final String URL 		= "url";
 	public static final String DESCRIPTION 		= "description";
 	
-	private static final String properties[][] = {{CATALOGURLID,LONG},{CATALOGID,LONG},{URL,STRING},{DESCRIPTION,STRING}};
+	private static final String properties[][] = {{CATALOGURLID,INTEGER},{CATALOGID,INTEGER},{URL,STRING},{DESCRIPTION,STRING}};
 	
 	public static final String PRIMARY_KEY = CATALOGURLID;
 	
@@ -45,6 +45,12 @@ public class CatalogUrl extends Common {
 
 	public String getNames() {
 		return names;
+	}
+
+	@Override
+	public String[] getStatements() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -17,10 +17,12 @@ public class CCollection extends Common implements Serializable {
 	
 	
 	
-	public static final String properties[][] = {{PRIMARY_KEY,LONG},{NAME,STRING},
+	public static final String properties[][] = {{PRIMARY_KEY,INTEGER},{NAME,STRING},
 		{USERID,STRING},{PUBLIC,STRING},{UPDATEDBY,DATE}};	
 
 	public static final String TABLE_NAME = "Collection";
+
+	public static final String CONCEPTS = "concepts";
 	
 	
 	private Mapping[] mappings = new Mapping[]{
@@ -31,6 +33,11 @@ public class CCollection extends Common implements Serializable {
 	public String getTable() {
 		
 		return TABLE_NAME;
+	}
+	
+	@Override
+	public String[] getChildren(){
+		return new String[]{CONCEPTS};
 	}
 	
 	@Override
@@ -57,6 +64,12 @@ public class CCollection extends Common implements Serializable {
 	public String getPrimaryKey() {
 		
 		return PRIMARY_KEY;
+	}
+
+	@Override
+	public String[] getStatements() {
+		
+		return null;
 	}
 	
 }

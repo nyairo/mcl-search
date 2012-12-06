@@ -1,6 +1,5 @@
 package mcl.search.data;
 
-import java.util.List;
 
 public class Catalog extends Common {
 
@@ -13,7 +12,7 @@ public class Catalog extends Common {
 	public static final String CATALOGID 	= "catalog_id";
 	public static final String NAME 		= "name";
 	
-	private static final String properties[][] = {{CATALOGID,LONG},{NAME,STRING}};
+	private static final String properties[][] = {{CATALOGID,INTEGER},{NAME,STRING}};
 	
 	public static final String PRIMARY_KEY = CATALOGID;
 	
@@ -37,5 +36,11 @@ public class Catalog extends Common {
 	public String getPrimaryKey() {
 		
 		return PRIMARY_KEY;
+	}
+
+	@Override
+	public String[] getStatements() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

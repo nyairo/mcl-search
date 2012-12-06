@@ -1,18 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-xmlns="http://java.sun.com/xml/ns/javaee" 
-xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" 
-xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
-  <display-name>mcl</display-name>
-  <welcome-file-list>
-    <welcome-file>index.html</welcome-file>
-    <welcome-file>index.htm</welcome-file>
-    <welcome-file>index.jsp</welcome-file>
-    <welcome-file>default.html</welcome-file>
-    <welcome-file>default.htm</welcome-file>
-    <welcome-file>default.jsp</welcome-file>
-  </welcome-file-list>
- 
+<web-app id="WebApp_ID" version="2.5"
+ xmlns="http://java.sun.com/xml/ns/javaee"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+ <display-name>mcl</display-name>
  <context-param>
   <param-name>javax.faces.PROJECT_STAGE</param-name>
   <param-value>Development</param-value>
@@ -45,26 +35,42 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
   <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
   <load-on-startup>1</load-on-startup>
  </servlet>
- 
-  <servlet>
+ <servlet>
   <description>Login servlet</description>
   <display-name>login</display-name>
   <servlet-name>login</servlet-name>
   <servlet-class>mcl.search.servlets.Login</servlet-class>
  </servlet>
- 
  <servlet>
   <description>DB servlet</description>
   <display-name>createdb</display-name>
   <servlet-name>createdb</servlet-name>
   <servlet-class>mcl.search.servlets.CreateDB</servlet-class>
  </servlet>
-  
  <servlet>
-  <description>ccollection</description>
+  <description>collection</description>
   <display-name>CCollectionServlet</display-name>
   <servlet-name>CCollectionServlet</servlet-name>
   <servlet-class>mcl.search.servlets.CCollectionServlet</servlet-class>
+ </servlet>
+ <servlet>
+  <description>delete collection</description>
+  <display-name>Delete Collection</display-name>
+  <servlet-name>deletecollection</servlet-name>
+  <servlet-class>mcl.search.servlets.DeleteCollectionServlet</servlet-class>
+ </servlet>
+ <servlet>
+  <description>add concepts</description>
+  <display-name>Add Concepts</display-name>
+  <servlet-name>addconcepts</servlet-name>
+  <servlet-class>mcl.search.servlets.AddConceptServlet</servlet-class>
+ </servlet>
+ 
+ <servlet>
+  <description>remove concepts</description>
+  <display-name>Remove Concepts</display-name>
+  <servlet-name>removeconcepts</servlet-name>
+  <servlet-class>mcl.search.servlets.RemoveConceptServlet</servlet-class>
  </servlet>
  
  <servlet-mapping>
@@ -82,17 +88,35 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
  <servlet-mapping>
   <servlet-name>createdb</servlet-name>
   <url-pattern>/createdb</url-pattern>
-  </servlet-mapping>
-
+ </servlet-mapping>
+ <servlet-mapping>
+  <servlet-name>addconcepts</servlet-name>
+  <url-pattern>/addconcepts</url-pattern>
+ </servlet-mapping>
+ <servlet-mapping>
+  <servlet-name>removeconcepts</servlet-name>
+  <url-pattern>/removeconcepts</url-pattern>
+ </servlet-mapping>
+ <servlet-mapping>
+  <servlet-name>deletecollection</servlet-name>
+  <url-pattern>/deletecollection</url-pattern>
+ </servlet-mapping>
  <servlet-mapping>
   <servlet-name>CCollectionServlet</servlet-name>
   <url-pattern>/collection</url-pattern>
  </servlet-mapping>
- 
  <mime-mapping>
   <extension>xcss</extension>
   <mime-type>text/css</mime-type>
  </mime-mapping>
+ <welcome-file-list>
+  <welcome-file>index.html</welcome-file>
+  <welcome-file>index.htm</welcome-file>
+  <welcome-file>index.jsp</welcome-file>
+  <welcome-file>default.html</welcome-file>
+  <welcome-file>default.htm</welcome-file>
+  <welcome-file>default.jsp</welcome-file>
+ </welcome-file-list>
  <error-page>
   <exception-type>javax.faces.application.ViewExpiredException</exception-type>
   <location>/index.jsp</location>
@@ -104,5 +128,5 @@ xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns
  <error-page>
   <exception-type>javax.faces.el.EvaluationException</exception-type>
   <location>/index.jsp</location>
- </error-page> 
+ </error-page>
 </web-app>

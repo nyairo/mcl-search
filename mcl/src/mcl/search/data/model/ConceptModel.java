@@ -17,7 +17,7 @@ public class ConceptModel extends BaseModel {
 	private static final long serialVersionUID = 1L;
 	private static final Log log = LogFactory.getLog(ConceptModel.class);
 
-	public Long insertConcept(Concept con) throws SQLException {
+	public Integer insertConcept(Concept con) throws SQLException {
 
 		return insertObject(con);
 	}
@@ -50,8 +50,8 @@ public class ConceptModel extends BaseModel {
 
 	}
 
-	public List<Concept> getConcepts(String collectionid) throws SQLException {
-		return (List<Concept>) getObjects(new Concept(),Concept.COLLECTIONID+"!=?", new String[]{collectionid});
+	public List<Concept> getConcepts(Integer collectionid) throws SQLException {
+		return (List<Concept>) getObjects(new Concept(),Concept.COLLECTIONID+"=?", new String[]{collectionid.toString()});
 	}
 
 	public boolean deleteConcept(Concept con) throws SQLException {

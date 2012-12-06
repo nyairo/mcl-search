@@ -112,7 +112,7 @@ public abstract class BaseModel  implements Serializable {
 		log.info("Set parameters. No. of params:"+insertStmt.getParameterMetaData().getParameterCount());
 	}
 	
-	protected Long insertObject(Common data) throws SQLException{
+	protected Integer insertObject(Common data) throws SQLException{
 		
 		//initialize values
 		Date now = new Date();
@@ -121,7 +121,7 @@ public abstract class BaseModel  implements Serializable {
 		data.put(Common.ACTIVE, Boolean.TRUE);
 		
 		String insertSql = null;
-		Long id = null;
+		Integer id = null;
 		Session session = null;
 		try{
 			session = DB.getSession(false);		
@@ -132,8 +132,9 @@ public abstract class BaseModel  implements Serializable {
 			ResultSet rs = session.getRs();
 			
 			rs.first();		
-			id = rs.getLong(1);
+			id = rs.getInt(1);
 			log.info("Insert record to table:"+data.getFQTable()+". Generated key:"+id);
+			data.put(data.getPrimaryKey(), id);
 		}catch(Exception e){
 			log.error(e);
 		}finally{
@@ -180,7 +181,10 @@ public abstract class BaseModel  implements Serializable {
 			
 			log.info("Update record in table:"+data.getFQTable());
 		}catch(Exception e){
-			log.error(e);
+			if(data!=null && updateSql!=null)
+				log.error(data.getFQTable()+"|"+e+"|"+updateSql);
+			else
+				log.error(e);
 		}finally{
 			if(session!=null)
 				session.close();
@@ -200,9 +204,10 @@ public abstract class BaseModel  implements Serializable {
 		
 
 		Session session = null;
+		String findSql = null;
 		try{
 			session = DB.getSession(false);
-			String findSql = getSQL(data, where);
+			findSql = getSQL(data, where);
 			session.createStatement(findSql);
 			setParameters(session.getStmt(), values);
 			session.executeQuery();
@@ -219,7 +224,10 @@ public abstract class BaseModel  implements Serializable {
 			}
 			log.info("Record not found on table with the given params:"+findSql);
 		}catch(Exception e){
-			log.error(e);
+			if(data!=null && findSql!=null)
+				log.error(data.getFQTable()+"|"+e+"|"+findSql);
+			else
+				log.error(e);
 		}
 		finally{
 			if(session!=null)
@@ -235,9 +243,10 @@ public abstract class BaseModel  implements Serializable {
 		List<Common> rows = new ArrayList<Common>();
 		
 		Session session = null;
+		String findSql = null;
 		try{
 			session = DB.getSession(false);
-			String findSql = getSQL(data, null);
+			findSql = getSQL(data, null);
 			session.createStatement(findSql);
 			session.executeQuery();
 			ResultSet rs = session.getRs();
@@ -256,7 +265,10 @@ public abstract class BaseModel  implements Serializable {
 			//}
 			
 		}catch(Exception e){
-			log.error(e);
+			if(data!=null && findSql!=null)
+				log.error(data.getFQTable()+"|"+e+"|"+findSql);
+			else
+				log.error(e);
 		}
 		finally{
 			if(session!=null)
@@ -267,20 +279,22 @@ public abstract class BaseModel  implements Serializable {
 	
 	/**
 	 * 
-	 * @param common
-	 * @param property
-	 * @param value
+	 * @param data
+	 * @param where
+	 * @param values
 	 * @return
-	 * @throws SQLException 
+	 * @throws SQLException
 	 */
 	public List<?> getObjects(Common data, String where, String[] values) throws SQLException {
 		
 		List<Common> lst = null;
 				
 		Session session = null;
+		String findSql = null; 
 		try{
 			session = DB.getSession(false);
-			session.createStatement(getSQL(data, where));
+			findSql = getSQL(data, where);
+			session.createStatement(findSql);
 			setParameters(session.getStmt(), values);
 			session.executeQuery();
 			ResultSet rs = session.getRs();
@@ -290,13 +304,16 @@ public abstract class BaseModel  implements Serializable {
 			while(rs.next()){
 				data = data.getClass().newInstance();
 				data.load(rs);	
-				lst.add(data);
+				lst.add(data);				
 			}			
 			
 			//log.info("Record not found on table with the given params:"+findSql);
 			
 		}catch(Exception e){
-			log.error(e);
+			if(data!=null && findSql!=null)
+				log.error(data.getFQTable()+"|"+e+"|"+findSql);
+			else
+				log.error(e);
 		}
 		finally{
 			if(session!=null)
@@ -311,7 +328,7 @@ public abstract class BaseModel  implements Serializable {
 	 */
 	public abstract Common getNew();
 
-	protected boolean deleteObject(Common data, String property) throws SQLException {
+	public boolean deleteObject(Common data, String property) throws SQLException {
 		String deleteSql = "DELETE FROM "+data.getFQTable()+" WHERE "+property+"="+data.get(property);
 		Session session = null;
 		boolean success = false;
@@ -325,12 +342,49 @@ public abstract class BaseModel  implements Serializable {
 			else
 				log.info("Record not deleted:"+deleteSql);
 		}catch(Exception e){
-			log.error(e);
+			if(data!=null && deleteSql!=null)
+				log.error(data.getFQTable()+"|"+e+"|"+deleteSql);
+			else
+				log.error(e);
 		}finally{
 			if(session!=null)
 				session.close();
 		}
 		return success;		
+	}
+	
+
+	public boolean deleteObjects(Common data, String where, String[] values) throws SQLException {
+		
+		Session session = null;
+		boolean success = false;
+		String deleteSql = null;
+		try{
+			session = DB.getSession(success);	
+			deleteSql = getDeleteSQL(data, where);
+			session.createStatement(deleteSql);
+			setParameters(session.getStmt(), values);			
+			success = session.execute();
+			
+			if(success)
+				log.info("Record(s) deleted:"+deleteSql);
+			else
+				log.info("Record(s) not deleted:"+deleteSql);
+		}catch(Exception e){
+			if(data!=null && deleteSql!=null)
+				log.error(data.getFQTable()+"|"+e+"|"+deleteSql);
+			else
+				log.error(e);
+		}finally{
+			if(session!=null)
+				session.close();
+		}
+		return success;		
+	}
+	
+	private String getDeleteSQL(Common data, String where){
+		 String deleteSql = "DELETE FROM "+data.getFQTable()+" WHERE "+where+";";
+		 return deleteSql;
 	}
 	/*
 	private String getSQL(Common data, String[] properties, String[] value, String[] ops){

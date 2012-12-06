@@ -24,8 +24,7 @@ public class CatalogsBean implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 	private static Log log = LogFactory.getLog(CatalogsBean.class);
 
-	private List<Catalog> catalogs = null;
-	//private List<CatalogUrl> urls = new ArrayList<CatalogUrl>();
+	private List<Catalog> catalogs = null;	
 		
 	public CatalogsBean(){
 		//load();	
@@ -49,10 +48,7 @@ public class CatalogsBean implements Serializable, Cloneable {
 		
 		try {
 			setCatalogs((List<Catalog>) model.getObjects(new Catalog()));
-			//if(getCatalogs()!=null)
-				//for(Catalog c: getCatalogs()){					
-					//setUrls(c.getUrls());
-				//}
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 			log.debug(e.getMessage());

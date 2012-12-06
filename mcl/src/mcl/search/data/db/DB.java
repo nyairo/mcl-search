@@ -289,9 +289,16 @@ public class DB {
 			//session.addBatch("UPDATE USER SET password=PASSWORD('"+userpassword+"') where USER='"+user+"'@'localhost';");
 			session.addBatch("GRANT ALL PRIVILEGES ON `"+schema+"`.* TO '"+user+"'@'localhost' WITH GRANT OPTION; \n");
 
+			String[] otherStmts = null;
 			for(Common c: tables){
 				session.addBatch(" DROP TABLE IF EXISTS "+c.getFQTable()+"; \n");
 				session.addBatch(c.getCreate(schema)+"\n");
+				otherStmts = c.getStatements();
+				if(otherStmts!=null){
+					for(String s: otherStmts){
+						session.addBatch(s);
+					}
+				}
 			}											
 			session.executeBatchQuery();
 			session.closeS();
@@ -312,36 +319,57 @@ public class DB {
 			List urls  = new ArrayList();
 			CatalogModel catm = new CatalogModel();
 			Catalog cat = (Catalog) catm.getNew().initialiaze();
-			cat.put(Catalog.NAME,"test");
+			cat.put(Catalog.NAME,"Manage Concept Collection");
 			CatalogUrl url = null;
 			
 			url = (CatalogUrl) catm.getNewUrl().initialiaze();
-			url.put(CatalogUrl.URL, "/Test");
-			url.put(CatalogUrl.DESCRIPTION, "Test desc");
+			url.put(CatalogUrl.URL, "GET /faces/addconcepts?q");
+			url.put(CatalogUrl.DESCRIPTION, "Add concepts to collection");
 			urls.add(url);
+			
+			url = (CatalogUrl) catm.getNewUrl().initialiaze();
+			url.put(CatalogUrl.URL, "GET /faces/removeconcepts?q");
+			url.put(CatalogUrl.DESCRIPTION, "Remove concepts from collection");
+			urls.add(url);
+			
+			url = (CatalogUrl) catm.getNewUrl().initialiaze();
+			url.put(CatalogUrl.URL, "GET /faces/collection?q");
+			url.put(CatalogUrl.DESCRIPTION, "List collection for a given criteria");
+			urls.add(url);
+			
 			cat.put(Catalog.URLS,urls);
 			
 			catm.insertCatalog(cat);
 			
 			cat = (Catalog) catm.getNew().initialiaze();
-			cat.put(Catalog.NAME,"test2");			
+			cat.put(Catalog.NAME,"Manage tags");			
 			
 			url = (CatalogUrl) catm.getNewUrl().initialiaze();
-			url.put(CatalogUrl.URL, "/Test2");
-			url.put(CatalogUrl.DESCRIPTION, "Test desc2");
+			url.put(CatalogUrl.URL, "GET /faces/addtags?q");
+			url.put(CatalogUrl.DESCRIPTION, "Add tags to concept");
 			urls.add(url);
 			cat.put(Catalog.URLS,urls);
 			
 			catm.insertCatalog(cat);
 			
 			
+			cat = (Catalog) catm.getNew().initialiaze();
+			cat.put(Catalog.NAME,"Management");			
 			
+			url = (CatalogUrl) catm.getNewUrl().initialiaze();
+			url.put(CatalogUrl.URL, "GET /faces/createdb?q");
+			url.put(CatalogUrl.DESCRIPTION, "Create application schema.");
+			urls.add(url);
+			cat.put(Catalog.URLS,urls);
+			
+			catm.insertCatalog(cat);
+								
 		} catch (SQLException e) {
 			
 			e.printStackTrace();
 			return e.getMessage();
 		}
 		
-		return "done";
+		return "Schema was created successfully.";
 	}
 }

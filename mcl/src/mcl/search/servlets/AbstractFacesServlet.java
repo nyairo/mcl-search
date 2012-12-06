@@ -35,7 +35,21 @@ public abstract class AbstractFacesServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final Log log = LogFactory.getLog(AbstractFacesServlet.class);
 	
+	protected static final String USER = "user";
+	protected static final String NAME = "name";
+	protected static final String CONCEPTS = "concepts";
+	protected static final String SOURCE = "source";
+	protected static final String SOURCE_ID = "source_id";
+	
+	
+	public static final String SCHEMA_NAME = "schema";	
+	public static final String PWORD = "password";
+	public static final String SUSER = "suser";
+	public static final String SPWORD = "spassword";
+	
 	public static final String ERROR = "error";
+	public static final String QUERY = "q";
+	protected String q = null;
 	
 	public AbstractFacesServlet() {
         super();
@@ -51,7 +65,7 @@ public abstract class AbstractFacesServlet extends HttpServlet {
     * @param response servlet response
     */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        processRequest(request, response); 
+        preProcessRequest(request, response); 
     }
     protected void log(FacesContext facesContext, String message) {
         facesContext.getExternalContext().log(message);
@@ -61,9 +75,19 @@ public abstract class AbstractFacesServlet extends HttpServlet {
     * @param response servlet response
     */ 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        processRequest(request, response);
+        preProcessRequest(request, response);
     }
-    protected FacesContext getFacesContext(HttpServletRequest request, HttpServletResponse response) {
+    
+    
+    
+    private void preProcessRequest(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
+    	q = request.getParameter(QUERY);
+    	
+    	processRequest(request, response);
+		
+	}
+	protected FacesContext getFacesContext(HttpServletRequest request, HttpServletResponse response) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         if (facesContext == null) {
 
@@ -91,10 +115,10 @@ public abstract class AbstractFacesServlet extends HttpServlet {
     }
 
     
-    protected void writeResponse(Long id, HttpServletResponse response) throws IOException{				
-		String message = ERROR;
-		if(id!=null)
-			message = id.toString();	
+    protected void writeResponse(String message, HttpServletResponse response) throws IOException{				
+		
+		if(message==null)
+			message = ERROR;	
 		writeResponse(response,message);
     }
     
