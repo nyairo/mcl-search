@@ -54,7 +54,7 @@ public class User extends Common {
 	}
 
 	@Override
-	public String[] getStatements() {
+	public String[] getStatements(String schema) {
 		// TODO Auto-generated method stub
 		return null;
 	}

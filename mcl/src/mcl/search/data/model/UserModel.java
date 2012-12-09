@@ -71,7 +71,7 @@ public class UserModel extends BaseModel implements Serializable {
 		return (List<User>) getObjects(new User(),User.USERNAME+"!=?", new String[]{"admin"});
 	}
 
-	public boolean deleteUser(User user) throws SQLException {
+	public int deleteUser(User user) throws SQLException {
 		return deleteObject(user, user.getPrimaryKey());
 	}
 	

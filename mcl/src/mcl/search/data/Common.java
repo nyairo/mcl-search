@@ -300,5 +300,5 @@ public abstract class Common extends HashMap<String,Object> implements Serializa
 		return (Integer) get(getPrimaryKey());
 	}
 	
-	public abstract String[] getStatements();
+	public abstract String[] getStatements(String schema);
 }

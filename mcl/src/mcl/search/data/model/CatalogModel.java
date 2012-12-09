@@ -90,7 +90,7 @@ public class CatalogModel extends BaseModel {
 		return (List<CatalogUrl>) getObjects(new CatalogUrl(),CatalogUrl.CATALOGID+"=?", new String[]{catalogid});
 	}
 
-	public boolean deleteCatalog(Catalog con) throws SQLException {
+	public int deleteCatalog(Catalog con) throws SQLException {
 		return deleteObject(con, con.getPrimaryKey());
 	}
 }

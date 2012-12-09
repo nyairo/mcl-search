@@ -67,7 +67,7 @@ public class CCollection extends Common implements Serializable {
 	}
 
 	@Override
-	public String[] getStatements() {
+	public String[] getStatements(String schema) {
 		
 		return null;
 	}

@@ -54,7 +54,7 @@ public class ConceptModel extends BaseModel {
 		return (List<Concept>) getObjects(new Concept(),Concept.COLLECTIONID+"=?", new String[]{collectionid.toString()});
 	}
 
-	public boolean deleteConcept(Concept con) throws SQLException {
+	public int deleteConcept(Concept con) throws SQLException {
 		return deleteObject(con, con.getPrimaryKey());
 	}
 }

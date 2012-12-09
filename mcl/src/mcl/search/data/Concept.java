@@ -40,11 +40,23 @@ public class Concept extends Common {
 		
 		return PRIMARY_KEY;
 	}
-
+/*
+	ALTER TABLE tbl_name
+    ADD [CONSTRAINT [symbol]] FOREIGN KEY
+    [index_name] (index_col_name, ...)
+    REFERENCES tbl_name (index_col_name,...)
+    [ON DELETE reference_option]
+    [ON UPDATE reference_option]
+	*/
 	@Override
-	public String[] getStatements() {
+	public String[] getStatements(String schema) {
 		String[] statements = new String[] {
-				"ALTER TABLE "+getFQTable()+" ADD UNIQUE INDEX `Uniq_Con`(`"+SOURCE+"`, `"+SOURCE_ID+"`, `"+COLLECTIONID+"`);"};
+				"ALTER TABLE "+getFQTable()+" ADD UNIQUE INDEX `Uniq_Con`(`"+SOURCE+"`, `"+SOURCE_ID+"`, `"+COLLECTIONID+"`);",
+				//"ALTER TABLE ADD FOREIGN KEY `FK_con_col` (`"+COLLECTIONID+"`);",
+				"ALTER TABLE "+getFQTable()
+					+" ADD CONSTRAINT `FK_con_col` FOREIGN KEY " +
+					" `FK_con_col` (`"+COLLECTIONID+"`)" +
+						" REFERENCES `"+schema+"`.`"+CCollection.TABLE_NAME+"` (`"+COLLECTIONID+"`) ON DELETE CASCADE ON UPDATE NO ACTION;"};
 		return statements;
 	}
 

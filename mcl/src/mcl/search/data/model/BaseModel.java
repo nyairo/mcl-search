@@ -328,19 +328,17 @@ public abstract class BaseModel  implements Serializable {
 	 */
 	public abstract Common getNew();
 
-	public boolean deleteObject(Common data, String property) throws SQLException {
+	public int deleteObject(Common data, String property) throws SQLException {
 		String deleteSql = "DELETE FROM "+data.getFQTable()+" WHERE "+property+"="+data.get(property);
 		Session session = null;
-		boolean success = false;
+		int success = 0;
 		try{
-			session = DB.getSession(success);			
+			session = DB.getSession(false);			
 			session.createStatement(deleteSql);
-			success = session.execute();
+			success = session.executeUpdate();
+						
+			log.info("{"+success+"} Record(s) were deleted:"+deleteSql);
 			
-			if(success)
-				log.info("Record deleted:"+deleteSql);
-			else
-				log.info("Record not deleted:"+deleteSql);
 		}catch(Exception e){
 			if(data!=null && deleteSql!=null)
 				log.error(data.getFQTable()+"|"+e+"|"+deleteSql);
@@ -354,22 +352,20 @@ public abstract class BaseModel  implements Serializable {
 	}
 	
 
-	public boolean deleteObjects(Common data, String where, String[] values) throws SQLException {
+	public int deleteObjects(Common data, String where, String[] values) throws SQLException {
 		
 		Session session = null;
-		boolean success = false;
+		int success = 0;
 		String deleteSql = null;
 		try{
-			session = DB.getSession(success);	
+			session = DB.getSession(false);	
 			deleteSql = getDeleteSQL(data, where);
 			session.createStatement(deleteSql);
 			setParameters(session.getStmt(), values);			
-			success = session.execute();
+			success = session.executeUpdate();
 			
-			if(success)
-				log.info("Record(s) deleted:"+deleteSql);
-			else
-				log.info("Record(s) not deleted:"+deleteSql);
+			log.info(success+" Record(s) deleted:"+deleteSql);
+			
 		}catch(Exception e){
 			if(data!=null && deleteSql!=null)
 				log.error(data.getFQTable()+"|"+e+"|"+deleteSql);

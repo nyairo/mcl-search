@@ -80,6 +80,12 @@ public class DB {
 		}
 	}
 
+	/**
+	 * 
+	 * @param isBatch
+	 * @return
+	 * @throws SQLException
+	 */
 	public static Session getSession(boolean isBatch) throws SQLException {
 
 		if (db_instance == null)
@@ -293,7 +299,7 @@ public class DB {
 			for(Common c: tables){
 				session.addBatch(" DROP TABLE IF EXISTS "+c.getFQTable()+"; \n");
 				session.addBatch(c.getCreate(schema)+"\n");
-				otherStmts = c.getStatements();
+				otherStmts = c.getStatements(schema);
 				if(otherStmts!=null){
 					for(String s: otherStmts){
 						session.addBatch(s);

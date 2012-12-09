@@ -95,11 +95,11 @@ public class RemoveConceptServlet extends AbstractFacesServlet {
 		
 				
 		try {
-			if(conmodel.deleteObjects(ncon, " "+Concept.COLLECTIONID+"=? AND "
+			removed = removed+conmodel.deleteObjects(ncon, " "+Concept.COLLECTIONID+"=? AND "
 					+Concept.SOURCE+"=? AND "+Concept.SOURCE_ID+"=?", new String[]{
-					col.toString(),c_source_id.toString(),c_source
-			}))	
-				removed++;
+					col.toString(),c_source,c_source_id.toString()});
+				
+				
 		} catch (SQLException e) {			
 			log.info(e);
 		}

@@ -53,6 +53,7 @@
   <servlet-name>CCollectionServlet</servlet-name>
   <servlet-class>mcl.search.servlets.CCollectionServlet</servlet-class>
  </servlet>
+ 
  <servlet>
   <description>delete collection</description>
   <display-name>Delete Collection</display-name>

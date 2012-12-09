@@ -87,7 +87,7 @@ public class CCollectionModel extends BaseModel  implements Serializable{
 		
 	}
 	
-	public boolean deleteCCollection(CCollection collection) throws SQLException{
+	public int deleteCCollection(CCollection collection) throws SQLException{
 		return deleteObject(collection,CCollection.PRIMARY_KEY);
 	}
 
